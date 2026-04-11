@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="533" viewBox="0 0 400 533" fill="none">
+  <rect width="400" height="533" fill="#1a1a1c"/>
+  <path d="M170 220h60v6h-60v-6zm0 16h60v6h-60v-6zm0 16h60v6h-60v-6zm0 16h60v6h-60v-6zm0 16h60v6h-60v-6z" fill="#333"/>
+  <rect x="160" y="200" width="80" height="120" rx="4" stroke="#444" stroke-width="2" fill="none"/>
+  <text x="200" y="360" text-anchor="middle" font-family="system-ui, sans-serif" font-size="14" fill="#666">No Image</text>
+</svg>
