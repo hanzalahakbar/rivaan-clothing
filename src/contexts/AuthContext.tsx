@@ -118,6 +118,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
           data: {
             display_name: credentials.displayName,
           },
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
         },
       });
 
@@ -126,15 +127,22 @@ export function AuthProvider({ children }: AuthProviderProps) {
       }
 
       if (data.user) {
-        // Update display name in profile if provided
-        if (credentials.displayName) {
+        // Check if email confirmation is required (no session means unconfirmed)
+        const needsEmailConfirmation = !data.session;
+
+        // Update display name in profile if provided and user is confirmed
+        if (credentials.displayName && data.session) {
           await supabase
             .from("profiles")
             .update({ display_name: credentials.displayName })
             .eq("id", data.user.id);
         }
 
-        return { success: true, user: data.user };
+        return {
+          success: true,
+          user: data.user,
+          needsEmailConfirmation,
+        };
       }
 
       return { success: false, error: "Failed to create account" };
@@ -155,6 +163,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
       });
 
       if (error) {
+        // Check for specific error codes
+        if (error.message?.includes("Email not confirmed")) {
+          return {
+            success: false,
+            error: "Please check your email and click the confirmation link before signing in.",
+          };
+        }
         // Generic error message for security (don't reveal if email exists)
         return { success: false, error: "Invalid email or password" };
       }

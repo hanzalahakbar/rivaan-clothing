@@ -7,7 +7,7 @@ import { z } from "zod";
 import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
 import { Button, Input, GlassCard, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui";
-import { AlertCircle, CheckCircle2 } from "lucide-react";
+import { AlertCircle, CheckCircle2, Mail } from "lucide-react";
 
 const signUpSchema = z
   .object({
@@ -32,6 +32,8 @@ export function SignUpForm() {
   const { signUpWithRedirect } = useAuth();
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [needsEmailConfirmation, setNeedsEmailConfirmation] = useState(false);
+  const [submittedEmail, setSubmittedEmail] = useState("");
 
   const {
     register,
@@ -44,6 +46,7 @@ export function SignUpForm() {
   const onSubmit = async (data: SignUpFormData) => {
     setError(null);
     setSuccess(false);
+    setNeedsEmailConfirmation(false);
 
     const result = await signUpWithRedirect(
       data.email,
@@ -53,6 +56,9 @@ export function SignUpForm() {
 
     if (!result.success) {
       setError(result.error || "Failed to create account");
+    } else if (result.needsEmailConfirmation) {
+      setNeedsEmailConfirmation(true);
+      setSubmittedEmail(data.email);
     } else {
       setSuccess(true);
     }
@@ -63,81 +69,103 @@ export function SignUpForm() {
       <CardHeader className="space-y-1 text-center">
         <CardTitle className="text-2xl font-bold">Create an account</CardTitle>
         <CardDescription>
-          Enter your details to get started with virtual try-on
+          Enter your details to get started shopping
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          {error && (
-            <div
-              className="flex items-center gap-2 p-3 text-sm text-destructive bg-destructive/10 rounded-md"
-              role="alert"
-            >
-              <AlertCircle className="h-4 w-4 flex-shrink-0" aria-hidden="true" />
-              <span>{error}</span>
-            </div>
-          )}
-
-          {success && (
-            <div
-              className="flex items-center gap-2 p-3 text-sm text-success bg-success/10 rounded-md"
-              role="alert"
-            >
-              <CheckCircle2 className="h-4 w-4 flex-shrink-0" aria-hidden="true" />
-              <span>Account created successfully! Redirecting...</span>
-            </div>
-          )}
-
-          <Input
-            label="Display Name (optional)"
-            type="text"
-            placeholder="John Doe"
-            autoComplete="name"
-            error={errors.displayName?.message}
-            {...register("displayName")}
-          />
-
-          <Input
-            label="Email"
-            type="email"
-            placeholder="you@example.com"
-            autoComplete="email"
-            error={errors.email?.message}
-            {...register("email")}
-          />
-
-          <Input
-            label="Password"
-            type="password"
-            placeholder="••••••••"
-            autoComplete="new-password"
-            error={errors.password?.message}
-            {...register("password")}
-          />
-
-          <Input
-            label="Confirm Password"
-            type="password"
-            placeholder="••••••••"
-            autoComplete="new-password"
-            error={errors.confirmPassword?.message}
-            {...register("confirmPassword")}
-          />
-
-          <div className="text-xs text-muted-foreground">
-            Password must be at least 8 characters with uppercase, lowercase, and
-            a number.
-          </div>
-
-          <Button
-            type="submit"
-            className="w-full"
-            isLoading={isSubmitting}
-            disabled={isSubmitting}
+        {needsEmailConfirmation ? (
+          <div
+            className="flex flex-col gap-3 p-4 text-sm bg-primary/10 rounded-md border border-primary/20"
+            role="alert"
           >
-            {isSubmitting ? "Creating account..." : "Create account"}
-          </Button>
-        </form>
+            <div className="flex items-center gap-2 text-primary font-medium">
+              <Mail className="h-5 w-5 flex-shrink-0" aria-hidden="true" />
+              <span>Check your email!</span>
+            </div>
+            <p className="text-muted-foreground">
+              We&apos;ve sent a confirmation link to <strong className="text-foreground">{submittedEmail}</strong>.
+              Please click the link to verify your email address before signing in.
+            </p>
+            <Link
+              href="/signin"
+              className="text-primary hover:underline text-center mt-2"
+            >
+              Go to Sign In →
+            </Link>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            {error && (
+              <div
+                className="flex items-center gap-2 p-3 text-sm text-destructive bg-destructive/10 rounded-md"
+                role="alert"
+              >
+                <AlertCircle className="h-4 w-4 flex-shrink-0" aria-hidden="true" />
+                <span>{error}</span>
+              </div>
+            )}
+
+            {success && (
+              <div
+                className="flex items-center gap-2 p-3 text-sm text-success bg-success/10 rounded-md"
+                role="alert"
+              >
+                <CheckCircle2 className="h-4 w-4 flex-shrink-0" aria-hidden="true" />
+                <span>Account created successfully! Redirecting...</span>
+              </div>
+            )}
+
+            <Input
+              label="Display Name (optional)"
+              type="text"
+              placeholder="John Doe"
+              autoComplete="name"
+              error={errors.displayName?.message}
+              {...register("displayName")}
+            />
+
+            <Input
+              label="Email"
+              type="email"
+              placeholder="you@example.com"
+              autoComplete="email"
+              error={errors.email?.message}
+              {...register("email")}
+            />
+
+            <Input
+              label="Password"
+              type="password"
+              placeholder="••••••••"
+              autoComplete="new-password"
+              error={errors.password?.message}
+              {...register("password")}
+            />
+
+            <Input
+              label="Confirm Password"
+              type="password"
+              placeholder="••••••••"
+              autoComplete="new-password"
+              error={errors.confirmPassword?.message}
+              {...register("confirmPassword")}
+            />
+
+            <div className="text-xs text-muted-foreground">
+              Password must be at least 8 characters with uppercase, lowercase, and
+              a number.
+            </div>
+
+            <Button
+              type="submit"
+              className="w-full"
+              isLoading={isSubmitting}
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Creating account..." : "Create account"}
+            </Button>
+          </form>
+        )}
       </CardContent>
       <CardFooter className="flex justify-center">
         <p className="text-sm text-muted-foreground">

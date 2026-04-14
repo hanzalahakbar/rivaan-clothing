@@ -50,6 +50,7 @@ export interface AuthResult {
   success: boolean;
   error?: string;
   user?: User;
+  needsEmailConfirmation?: boolean;
 }
 
 /**

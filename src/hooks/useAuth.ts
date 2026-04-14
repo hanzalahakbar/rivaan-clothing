@@ -13,7 +13,7 @@ export function useAuth() {
   const router = useRouter();
 
   /**
-   * Sign up and redirect to home on success
+   * Sign up and redirect to home on success (only if no email confirmation needed)
    */
   const signUpWithRedirect = useCallback(
     async (
@@ -23,7 +23,8 @@ export function useAuth() {
       redirectTo: string = "/"
     ) => {
       const result = await auth.signUp({ email, password, displayName });
-      if (result.success) {
+      // Only redirect if signup successful AND no email confirmation needed
+      if (result.success && !result.needsEmailConfirmation) {
         router.push(redirectTo);
         router.refresh();
       }
