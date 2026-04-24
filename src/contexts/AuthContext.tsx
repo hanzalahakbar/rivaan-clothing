@@ -60,50 +60,70 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   // Initialize auth state
   useEffect(() => {
+    let isMounted = true;
+
+    // Safety fallback: ensure the loading spinner never gets stuck indefinitely
+    const loadingTimeout = setTimeout(() => {
+      if (isMounted) setIsLoading(false);
+    }, 5000);
+
     const initializeAuth = async () => {
       try {
         const {
           data: { session: currentSession },
         } = await supabase.auth.getSession();
 
+        if (!isMounted) return;
+
         if (currentSession?.user) {
           setSession(currentSession);
           setUser(currentSession.user);
           const profileData = await fetchProfile(currentSession.user.id);
+          if (!isMounted) return;
           setProfile(profileData);
         }
       } catch (error) {
         console.error("Error initializing auth:", error);
       } finally {
-        setIsLoading(false);
+        if (isMounted) {
+          clearTimeout(loadingTimeout);
+          setIsLoading(false);
+        }
       }
     };
 
     initializeAuth();
 
-    // Listen for auth state changes
+    // Listen for auth state changes.
+    // IMPORTANT: Do NOT await any Supabase calls directly inside this callback —
+    // it can deadlock Supabase's auth state machine. Defer with setTimeout(0).
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, newSession) => {
+    } = supabase.auth.onAuthStateChange((event, newSession) => {
       setSession(newSession);
       setUser(newSession?.user ?? null);
 
-      if (newSession?.user) {
-        const profileData = await fetchProfile(newSession.user.id);
-        setProfile(profileData);
-      } else {
-        setProfile(null);
-      }
-
-      // Handle specific auth events
       if (event === "SIGNED_OUT") {
         setUser(null);
         setProfile(null);
         setSession(null);
+        return;
+      }
+
+      if (newSession?.user) {
+        const userId = newSession.user.id;
+        setTimeout(async () => {
+          const profileData = await fetchProfile(userId);
+          if (isMounted) setProfile(profileData);
+        }, 0);
+      } else {
+        setProfile(null);
       }
     });
 
     return () => {
+      isMounted = false;
+      clearTimeout(loadingTimeout);
       subscription.unsubscribe();
     };
   }, [supabase, fetchProfile]);

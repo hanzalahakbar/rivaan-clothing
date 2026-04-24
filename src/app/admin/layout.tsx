@@ -25,14 +25,22 @@ const navItems = [
 ];
 
 export default function AdminLayout({ children }: AdminLayoutProps) {
-  const { isLoading, isAuthenticated, isAdmin, requireAdmin } = useAuth();
+  const { isLoading, isAuthenticated, isAdmin, user, profile, requireAdmin } = useAuth();
   const pathname = usePathname();
 
   useEffect(() => {
+    console.log("[AdminLayout] auth state:", {
+      isLoading,
+      isAuthenticated,
+      isAdmin,
+      userEmail: user?.email,
+      profileExists: !!profile,
+      profileIsAdmin: profile?.is_admin,
+    });
     if (!isLoading) {
       requireAdmin("/");
     }
-  }, [isLoading, requireAdmin]);
+  }, [isLoading, isAuthenticated, isAdmin, user, profile, requireAdmin]);
 
   // Loading state
   if (isLoading) {

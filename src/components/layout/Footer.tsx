@@ -35,9 +35,6 @@ export function Footer() {
                   className="object-cover"
                 />
               </div>
-              <span className="text-2xl font-semibold tracking-tight">
-                Vestiti
-              </span>
             </Link>
             <p className="text-sm text-background/60 leading-relaxed mb-6">
               Modern fashion for girls. Try on outfits virtually before you buy with our AI-powered experience.
@@ -177,7 +174,7 @@ export function Footer() {
       <div className="border-t border-background/10">
         <div className="container-fashion py-6 flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-xs text-background/40">
-            &copy; {currentYear} Vestiti. All rights reserved.
+            &copy; {currentYear} Rivaan. All rights reserved.
           </p>
           <div className="flex items-center gap-6">
             <a
