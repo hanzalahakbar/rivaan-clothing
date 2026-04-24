@@ -72,10 +72,6 @@ export default async function ProductDetailPage({
                 sizes="(max-width: 1024px) 100vw, 50vw"
                 className="object-cover"
                 priority
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.src = PLACEHOLDER_IMAGE;
-                }}
               />
             </div>
 
