@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Download, Share2, ShoppingCart, RefreshCw, Loader2 } from "lucide-react";
 import { Button, useToast } from "@/components/ui";
 import { downloadImage } from "@/lib/services/download.service";
+import { formatCurrency } from "@/lib/utils";
 import type { GenerationJobWithDetails } from "@/lib/services/tryon.service";
 import type { Product } from "@/types";
 
@@ -97,7 +98,7 @@ export function TryOnResult({ job, onTryAnother }: TryOnResultProps) {
             {product.name}
           </h2>
           <p className="text-lg text-primary font-medium mt-1">
-            ${product.price.toFixed(2)}
+            {formatCurrency(product.price)}
           </p>
         </div>
       )}

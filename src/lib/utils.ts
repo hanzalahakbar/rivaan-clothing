@@ -14,13 +14,13 @@ export function cn(...inputs: ClassValue[]) {
  */
 export function formatCurrency(
   amount: number,
-  currency: string = "USD",
-  locale: string = "en-US"
+  _currency: string = "PKR",
+  locale: string = "en-PK"
 ): string {
-  return new Intl.NumberFormat(locale, {
-    style: "currency",
-    currency,
+  const number = new Intl.NumberFormat(locale, {
+    maximumFractionDigits: 0,
   }).format(amount);
+  return `Rs ${number}`;
 }
 
 /**

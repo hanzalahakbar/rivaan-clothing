@@ -81,7 +81,7 @@ export function PriceRangeFilter({
       <div className="flex items-center gap-2">
         <Input
           type="number"
-          placeholder={`$${priceRange.min}`}
+          placeholder={`Rs ${priceRange.min}`}
           value={minValue}
           onChange={(e) => setMinValue(e.target.value)}
           min={0}
@@ -90,7 +90,7 @@ export function PriceRangeFilter({
         <span className="text-muted-foreground">-</span>
         <Input
           type="number"
-          placeholder={`$${priceRange.max}`}
+          placeholder={`Rs ${priceRange.max}`}
           value={maxValue}
           onChange={(e) => setMaxValue(e.target.value)}
           min={0}
@@ -98,7 +98,7 @@ export function PriceRangeFilter({
         />
       </div>
       <p className="text-xs text-muted-foreground">
-        Range: ${priceRange.min} - ${priceRange.max}
+        Range: Rs {priceRange.min} - Rs {priceRange.max}
       </p>
     </div>
   );
